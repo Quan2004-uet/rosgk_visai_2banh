@@ -1,0 +1,33 @@
+<launch>
+    <!-- Khởi động Gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find test1)/worlds/empty.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="false"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <!-- Load mô tả robot -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find test1)/urdf/test1.urdf'" />
+
+    <!-- Spawn robot vào Gazebo -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" 
+          args="-urdf -model test1 -param robot_description"/>
+
+    <!-- Tải thông số wheels -->
+    <rosparam command="load" file="$(find test1)/config/controller.yaml" />
+    
+    
+    <!-- Khởi động bộ điều khiển -->
+    <node
+        name="controller_spawner"
+        pkg="controller_manager"
+        type="spawner"
+        args="joint_state_controller left_wheel_joint_velocity_controller right_wheel_joint_velocity_controller prismatic_controller rotation_controller" />
+
+
+
+
+</launch>
